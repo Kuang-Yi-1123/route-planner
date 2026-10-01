@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- cache-bust: force fresh deploy -->
 <html lang="zh-Hant">
     <head>
         <meta charset="UTF-8">
@@ -67411,16 +67410,28 @@
                                         passive: true
                                     });
 
-                                    // 剖面區塊的大小會隨視窗、以及上方提醒文字的行數改變，尺寸一變就重畫
-                                    var resizeQueued = false;
+                                    // 剖面區塊的大小會隨視窗、以及上方提醒文字的行數改變，尺寸一變就重畫。
+                                    // 全螢幕切換這類轉場是漸變的，尺寸會連續變好幾個影格；如果每影格都重畫一次
+                                    // （整個 SVG 拆掉重建），畫面在轉場過程中會一直閃爍，改成等尺寸停止變動
+                                    // 一小段時間後才畫一次。
+                                    // 另外，寬路線有時會讓頁面出現水平捲軸，捲軸一開一關本身又會讓可用高度
+                                    // 小幅變動、再次觸發這個監聽——重畫個幾十次才會停下來，一樣會閃。
+                                    // 所以只有尺寸真的變超過幾個像素（不是捲軸那種一兩像素的來回）才重畫。
+                                    var resizeDebounce = null;
+                                    var lastRenderedW = null
+                                      , lastRenderedH = null;
                                     function queueProfileRender() {
-                                        if (resizeQueued)
-                                            return;
-                                        resizeQueued = true;
-                                        requestAnimationFrame(function() {
-                                            resizeQueued = false;
+                                        clearTimeout(resizeDebounce);
+                                        resizeDebounce = setTimeout(function() {
+                                            resizeDebounce = null;
+                                            var w = profileWrap.clientWidth
+                                              , h = profileWrap.clientHeight;
+                                            if (lastRenderedW !== null && Math.abs(w - lastRenderedW) <= 3 && Math.abs(h - lastRenderedH) <= 3)
+                                                return;
+                                            lastRenderedW = w;
+                                            lastRenderedH = h;
                                             renderProfile();
-                                        });
+                                        }, 150);
                                     }
                                     if (window.ResizeObserver)
                                         new ResizeObserver(queueProfileRender).observe(profileWrap);
