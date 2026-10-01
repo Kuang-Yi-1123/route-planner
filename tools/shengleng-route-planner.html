@@ -67383,19 +67383,10 @@
                                         }
                                     }
 
-                                    // 記住游標最後位置：全螢幕切換等情況會觸發下面的 resize 重畫，
-                                    // 重畫會換一批全新的 hoverLine/hoverDot（預設隱藏），若不補畫，
-                                    // 滑鼠明明還停在原地，圖卻會憑空消失一下再等下一次真的移動才出現，看起來像抖動。
-                                    var lastHoverClientX = null
-                                      , lastHoverClientY = null
-                                      , hoveringProfile = false;
                                     function onProfilePointer(ev) {
                                         var g = PROFILE_GEOM;
                                         if (!g || !PROFILE_STATE)
                                             return;
-                                        lastHoverClientX = ev.clientX;
-                                        lastHoverClientY = ev.clientY;
-                                        hoveringProfile = true;
                                         var rect = profileSvg.getBoundingClientRect();
                                         var px = ev.clientX - rect.left;
                                         var dist = (px - g.padL) / (rect.width - g.padL - g.padR) * g.maxD;
@@ -67405,10 +67396,7 @@
                                         setRouteHover(nearestProfileIdx(PROFILE_STATE.profile, dist));
                                     }
                                     profileSvg.addEventListener('mousemove', onProfilePointer);
-                                    profileSvg.addEventListener('mouseleave', function() {
-                                        hoveringProfile = false;
-                                        clearRouteHover();
-                                    });
+                                    profileSvg.addEventListener('mouseleave', clearRouteHover);
                                     profileSvg.addEventListener('touchstart', function(ev) {
                                         if (ev.touches[0])
                                             onProfilePointer(ev.touches[0]);
@@ -67431,13 +67419,6 @@
                                         requestAnimationFrame(function() {
                                             resizeQueued = false;
                                             renderProfile();
-                                            // 重畫換了新的 hoverLine/hoverDot，游標若還停在原位就立刻補畫，
-                                            // 不必等使用者再動一下滑鼠
-                                            if (hoveringProfile && lastHoverClientX !== null)
-                                                onProfilePointer({
-                                                    clientX: lastHoverClientX,
-                                                    clientY: lastHoverClientY
-                                                });
                                         });
                                     }
                                     if (window.ResizeObserver)
