@@ -123,7 +123,7 @@
             }
 
             .topmeta {
-                display: flex;
+                display: none;
                 gap: 20px;
                 color: var(--muted);
                 font-size: 13px;
@@ -1438,9 +1438,9 @@
                     </span>
                     <span>路徑在瀏覽器內即時計算</span>
                     <span>
-                        高程剖面 <b id="metaProfiles">0</b>
-                        ／<b id="metaProfilesTotal">–</b>
-                        段
+                        目前區域 <b id="metaRegionName">–</b>
+                        ・<b id="metaRegionEdges">–</b>
+                        段線
                     </span>
                 </div>
             </header>
@@ -68529,6 +68529,7 @@
                                     }
 
                                     function updateOverviewRegion() {
+                                        updateRegionMeta();
                                         var el = document.getElementById('overviewRegion');
                                         if (!el)
                                             return;
@@ -69190,7 +69191,6 @@
                                                 return;
                                             // 載入期間又按了一次（或清掉了），以新的那次為準
                                             setCalcBusy(false);
-                                            updateProfileMeta();
                                             CALC_SEQ = seq;
                                             CURRENT_SETS = {
                                                 time: found.time.map(computeRoute),
@@ -69350,16 +69350,13 @@
                                         showRouteSet(btn.getAttribute('data-mode'));
                                     });
 
-                                    // 頁首的「高程剖面 N／總數 段」：剖面按區載入，這裡顯示目前已經載入幾段
-                                    function updateProfileMeta() {
-                                        var n = 0;
-                                        EDGES.forEach(function(e) {
-                                            if (e.profile)
-                                                n++;
-                                        });
-                                        document.getElementById('metaProfiles').textContent = n;
+                                    // 頁首顯示目前點選的區塊有幾段路線
+                                    function updateRegionMeta() {
+                                        var c = COMPS[ACTIVE_COMP];
+                                        document.getElementById('metaRegionName').textContent = c ? c.name + '一帶' : '–';
+                                        document.getElementById('metaRegionEdges').textContent = c ? c.edges : '–';
                                     }
-                                    document.getElementById('metaProfilesTotal').textContent = EDGES.length;
+                                    updateRegionMeta();
 
                                     initOverviewMap();
                                     // 按鈕列貼在地圖最底下，右邊要讓出版權文字的寬度，提示框才不會被它蓋住
