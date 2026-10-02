@@ -834,19 +834,20 @@
             }
 
             .map-hint {
-                position: absolute;
-                top: 14px;
-                left: 14px;
-                z-index: 800;
-                max-width: calc(100% - 360px);
+                position: static;
+                flex: 0 1 auto;
+                align-self: auto;
+                min-width: 0;
+                max-width: var(--hint-max, none);
+                margin: 0;
                 background: rgba(20,24,28,0.92);
                 color: var(--ink);
                 border: 1px solid var(--line-strong);
-                border-radius: 8px;
-                padding: 8px 13px;
-                font-size: 14px;
+                border-radius: 6px;
+                padding: 5px 9px;
+                font-size: 12px;
                 font-weight: 500;
-                line-height: 1.5;
+                line-height: 1.4;
                 pointer-events: none;
             }
 
@@ -858,19 +859,47 @@
             .map-tools {
                 position: absolute;
                 left: 14px;
-                bottom: 22px;
+                right: 14px;
+                bottom: 4px;
                 z-index: 800;
                 display: flex;
+                align-items: flex-end;
                 gap: 6px;
+                pointer-events: none;
+            }
+
+            /* 右邊放不下提示框（被版權文字擠到）時，提示框改放到按鈕上面 */
+            .map-tools.hint-above {
+                flex-direction: column-reverse;
+                align-items: flex-start;
+            }
+
+            .map-tools.hint-above .map-hint {
+                max-width: calc(100% - 50px);
+            }
+
+            .map-btns {
+                display: flex;
+                gap: 6px;
+                flex: none;
+            }
+
+            .map-tools > * {
+                pointer-events: auto;
+            }
+
+            .map-tools > .map-hint {
+                pointer-events: none;
             }
 
             .map-tool {
-                padding: 8px 14px;
+                flex: none;
+                padding: 5px 10px;
                 background: rgba(20,24,28,0.92);
                 color: var(--ink);
                 border: 1px solid var(--line-strong);
                 border-radius: 6px;
-                font-size: 14px;
+                font-size: 12.5px;
                 cursor: pointer;
             }
 
@@ -891,6 +920,69 @@
 
             .leaflet-container {
                 font-family: 'Noto Sans TC',sans-serif;
+            }
+
+            /* 計算過的路線記錄 */
+            .hist-list {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .hist-item {
+                display: flex;
+                align-items: stretch;
+                border: 1px solid var(--line-strong);
+                border-radius: 6px;
+                background: var(--panel-2);
+                overflow: hidden;
+            }
+
+            .hist-main {
+                flex: 1;
+                min-width: 0;
+                text-align: left;
+                padding: 7px 10px;
+                background: none;
+                border: none;
+                color: var(--ink);
+                cursor: pointer;
+                font-size: 13px;
+                line-height: 1.45;
+            }
+
+            .hist-main:hover {
+                background: var(--panel-3);
+            }
+
+            .hist-main .hist-names {
+                display: block;
+                font-weight: 500;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .hist-main .hist-meta {
+                display: block;
+                color: var(--muted);
+                font-size: 12px;
+            }
+
+            .hist-del {
+                flex: none;
+                width: 30px;
+                background: none;
+                border: none;
+                border-left: 1px solid var(--line);
+                color: var(--muted);
+                cursor: pointer;
+                font-size: 13px;
+            }
+
+            .hist-del:hover {
+                color: var(--ink);
+                background: var(--panel-3);
             }
 
             /* 保護區輪廓畫在自己的 pane；上層 overlayPane 的 canvas 讓事件穿過去，地圖點選才不會被擋住 */
@@ -1010,7 +1102,24 @@
             .leaflet-control-attribution {
                 background: rgba(255,255,255,0.85) !important;
                 color: #333;
-                font-size: 11.5px;
+                font-size: 9.5px;
+                line-height: 1.5;
+                white-space: nowrap;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            @media (max-width: 1300px) {
+                .leaflet-control-attribution {
+                    font-size: 8px;
+                }
+            }
+
+            @media (max-width: 640px) {
+                .leaflet-control-attribution {
+                    font-size: 5.5px;
+                }
             }
 
             .leaflet-control-attribution a {
@@ -1083,11 +1192,12 @@
                 margin: 0 6px;
             }
 
+
             /* ---------- 下方：統計與高程剖面 ---------- */
             .bottom {
                 background: var(--panel);
                 border-top: 1px solid var(--line);
-                height: clamp(320px, 46vh, 460px);
+                height: clamp(340px, 56vh, 620px);
                 display: flex;
                 flex-direction: column;
                 min-height: 0;
@@ -1131,8 +1241,8 @@
 
             .bottom-head {
                 display: flex;
-                justify-content: space-between;
-                gap: 30px;
+                flex-direction: column;
+                gap: 6px;
                 padding: 14px 20px 4px;
             }
 
@@ -1168,9 +1278,9 @@
             }
 
             .notes {
-                max-width: 390px;
-                font-size: 13.5px;
-                line-height: 1.65;
+                max-width: none;
+                font-size: 13px;
+                line-height: 1.55;
                 color: var(--muted);
                 margin: 0;
             }
@@ -1262,10 +1372,7 @@
                 }
 
                 .map-hint {
-                    max-width: calc(100% - 28px);
-                    top: auto;
-                    bottom: 70px;
-                    font-size: 13px;
+                    font-size: 12px;
                 }
 
                 .leaflet-control-layers label {
@@ -1328,10 +1435,10 @@
             <aside class="side">
                 <section class="sec">
                     <div class="sec-head">
-                        <h2>起點與終點</h2>
+                        <h2>起點</h2>
                         <span class="note">也可以直接點地圖</span>
                     </div>
-                    <div class="pick-grid">
+                    <div class="pick-grid" style="grid-template-columns:1fr">
                         <div class="field">
                             <label for="startSearch">
                                 <i class="start"></i>
@@ -1341,7 +1448,7 @@
                             <ul class="combo-list" id="startList" role="listbox" hidden></ul>
                             <select id="startSel" hidden></select>
                         </div>
-                        <div class="field">
+                        <div class="field" style="display:none">
                             <label for="finishSearch">
                                 <i class="finish"></i>
                                 終點
@@ -1355,7 +1462,7 @@
                 <section class="sec">
                     <div class="sec-head">
                         <h2>通過點</h2>
-                        <span class="note">依勾選順序走訪</span>
+                        <span class="note">依勾選順序走訪，最後一個即為終點</span>
                     </div>
                     <input class="search" id="viaSearch" type="search" placeholder="搜尋通過點（例如：營地、山屋）" autocomplete="off">
                     <div class="via-box" id="viaBox"></div>
@@ -1371,8 +1478,15 @@
                     </div>
                     <button class="btn-main" id="calcBtn" type="button">計算路線</button>
                     <p class="err" id="errBox"></p>
+                </section>
+                <section class="sec" id="historySec" hidden>
+                    <div class="sec-head">
+                        <h2>計算過的路線</h2>
+                        <span class="note">點一下重新載入並計算</span>
+                    </div>
+                    <div class="hist-list" id="historyList"></div>
                     <div class="link-row">
-                        <button class="link-btn" id="overviewClear" type="button">清除所有選點</button>
+                        <button class="link-btn" id="historyClear" type="button">清除記錄</button>
                     </div>
                 </section>
                 <section class="sec">
@@ -1395,9 +1509,6 @@
                         </button>
                     </div>
                     <div class="path-cards" id="pathCards"></div>
-                    <div class="link-row">
-                        <button class="link-btn" id="clearRouteSide" type="button">清除路線</button>
-                    </div>
                 </section>
                 <section class="sec" data-when-route>
                     <div class="sec-head">
@@ -1443,37 +1554,39 @@
             <main class="main">
                 <div class="map-area">
                     <div id="overviewMap"></div>
-                    <p class="map-hint" id="overviewPick"></p>
                     <div class="map-tools">
-                        <button class="map-tool on" id="toggleLabels" type="button" aria-pressed="true">顯示名稱</button>
-                        <button class="map-tool" id="fitRoute" type="button">對準路線</button>
-                        <button class="map-tool" id="clearRouteMap" type="button">清除路線</button>
+                        <div class="map-btns">
+                            <button class="map-tool on" id="toggleLabels" type="button" aria-pressed="true">顯示名稱</button>
+                            <button class="map-tool" id="fitRoute" type="button">對準路線</button>
+                            <button class="map-tool" id="clearRouteMap" type="button">清除路線</button>
+                        </div>
+                        <p class="map-hint" id="overviewPick"></p>
                     </div>
                 </div>
                 <section class="bottom">
                     <div class="bottom-empty" id="emptyState">
                         <p>
                             <span class="glyph">⛰</span>
-                            選好起點與終點後按「計算路線」，<br>這裡會顯示距離、時間、爬升與高程剖面。
+                            選好起點與通過點後按「計算路線」，<br>這裡會顯示距離、時間、爬升與高程剖面。
                         </p>
                     </div>
                     <div class="bottom-body" id="results">
                         <div class="bottom-head">
                             <div class="stats">
                                 <div class="stat">
-                                    <div class="k">距離</div>
+                                    <div class="k">總距離</div>
                                     <div class="v" id="statDist">–</div>
                                 </div>
                                 <div class="stat">
-                                    <div class="k">時間</div>
+                                    <div class="k">總時長</div>
                                     <div class="v" id="statTime">–</div>
                                 </div>
                                 <div class="stat rise">
-                                    <div class="k">爬升</div>
+                                    <div class="k">累積爬升量</div>
                                     <div class="v" id="statGain">–</div>
                                 </div>
                                 <div class="stat fall">
-                                    <div class="k">下降</div>
+                                    <div class="k">累積下降量</div>
                                     <div class="v" id="statLoss">–</div>
                                 </div>
                             </div>
@@ -66651,9 +66764,9 @@
                                     // 任何用到某段第 K+1 名的組合，把那段換成前 K 名都至少有 K 條不比它長。
                                     // 組合數固定在 K×K 以內，不會隨通過點變多而爆掉。
                                     function allRoutesForSequence(seq) {
-                                        var globalStart = seq[0]
-                                          , globalFinish = seq[seq.length - 1];
-                                        var forbidden = new Set([globalStart, globalFinish]);
+                                        // 照順序走訪時，起點與最後一個通過點在中途也可以再經過（例如東峰→主峰→南峰
+                                        // 會穿過起點附近的樞紐），所以不設禁行點。
+                                        var forbidden = new Set();
                                         var k = MAX_SHOWN_ROUTES;
 
                                         var beam = [{
@@ -66661,7 +66774,8 @@
                                             dist: 0
                                         }];
                                         for (var i = 0; i < seq.length - 1; i++) {
-                                            var opts = kShortestPaths(seq[i], seq[i + 1], forbidden, k);
+                                            // 相鄰兩點是同一個點（例如第一個通過點就是起點）：這一段原地不動，不用找路
+                                            var opts = seq[i] === seq[i + 1] ? [[]] : kShortestPaths(seq[i], seq[i + 1], forbidden, k);
                                             if (opts.length === 0)
                                                 return [];
                                             var next = [];
@@ -66744,6 +66858,22 @@
                                                 elev: pts[pts.length - 1][1]
                                             });
                                         });
+                                        // 通過點的編號依「實際走到的順序」標：第 k 個通過點在路線上第一次走到它的位置才編 k，
+                                        // 途中順路經過、但還沒輪到（或已走過）的通過點只是普通的點，不編號。
+                                        var nextVia = 1;
+                                        // 與前一點相同的通過點（原地不動的那一段）沒有對應的位置，直接跳過
+                                        function skipSamePoint() {
+                                            while (CALC_SEQ && nextVia < CALC_SEQ.length && CALC_SEQ[nextVia] === CALC_SEQ[nextVia - 1])
+                                                nextVia++;
+                                        }
+                                        skipSamePoint();
+                                        waypoints.forEach(function(wp, wi) {
+                                            if (wi > 0 && CALC_SEQ && nextVia < CALC_SEQ.length && wp.id === CALC_SEQ[nextVia]) {
+                                                wp.viaOrder = nextVia;
+                                                nextVia++;
+                                                skipSamePoint();
+                                            }
+                                        });
                                         return {
                                             legs: legs,
                                             totalDist: totalDist,
@@ -66803,6 +66933,90 @@
                                     // 起點／終點用文字搜尋：輸入框只是 select 的外殼，選定時改 select.value 再發 change，
                                     // 其他流程（地圖點選、清除、換區）也都只改 select，輸入框的文字由 syncPointSearch 跟著更新。
                                     var POINT_SEARCHES = [];
+                                    // ---------- 名稱查找：容許相關字樣 ----------
+                                    // 先統一常見的異體／近形字（嶺／陵／領、臺／台…），再依「連續包含 > 依序包含 > 部分字相同」
+                                    // 排序；有比較準的結果時就不列「只有一兩個字相同」的，沒有時才退一步列出來。
+                                    var CHAR_VARIANTS = {
+                                        '嶺': '陵',
+                                        '岭': '陵',
+                                        '領': '陵',
+                                        '臺': '台',
+                                        '峯': '峰',
+                                        '庄': '莊',
+                                        '叉': '岔',
+                                        '裏': '裡',
+                                        '里': '裡',
+                                        '堃': '坤',
+                                        '﨑': '崎'
+                                    };
+                                    function normSearch(s) {
+                                        return String(s).toLowerCase().replace(/\s+/g, '').replace(/[\s\S]/g, function(c) {
+                                            return CHAR_VARIANTS[c] || c;
+                                        });
+                                    }
+                                    function fuzzyScore(name, q) {
+                                        var k = normSearch(q);
+                                        if (!k)
+                                            return 1;
+                                        var n = normSearch(name);
+                                        var at = n.indexOf(k);
+                                        if (at === 0)
+                                            return 1000;
+                                        if (at > 0)
+                                            return 900 - at;
+                                        var j = 0;
+                                        for (var i = 0; i < n.length && j < k.length; i++) {
+                                            if (n.charAt(i) === k.charAt(j))
+                                                j++;
+                                        }
+                                        if (j === k.length)
+                                            return 600;
+                                        var uniq = {}
+                                          , total = 0
+                                          , hit = 0;
+                                        for (var m = 0; m < k.length; m++) {
+                                            var c = k.charAt(m);
+                                            if (uniq[c])
+                                                continue;
+                                            uniq[c] = true;
+                                            total++;
+                                            if (n.indexOf(c) !== -1)
+                                                hit++;
+                                        }
+                                        return (hit > 0 && hit / total >= 0.5) ? Math.round(100 * hit / total) : 0;
+                                    }
+                                    function fuzzyFilter(names, q) {
+                                        // 回傳每個名稱是否列出；有比較準的結果（連續／依序包含）時，只留那一檔
+                                        var scores = names.map(function(nm) {
+                                            return fuzzyScore(nm, q);
+                                        });
+                                        var strong = scores.some(function(s) {
+                                            return s >= 600;
+                                        });
+                                        return scores.map(function(s) {
+                                            return strong ? s >= 600 : s > 0;
+                                        }).map(function(ok, i) {
+                                            return {
+                                                ok: ok,
+                                                score: scores[i]
+                                            };
+                                        });
+                                    }
+                                    // 把符合的字標色：連續包含就標那一段，否則標有出現在查詢字裡的字
+                                    function fuzzyMarkHtml(name, q) {
+                                        var n = normSearch(name)
+                                          , k = normSearch(q);
+                                        if (!k || n.length !== name.length)
+                                            return escapeHtml(name);
+                                        var at = n.indexOf(k);
+                                        var out = '';
+                                        for (var i = 0; i < name.length; i++) {
+                                            var on = at >= 0 ? (i >= at && i < at + k.length) : k.indexOf(n.charAt(i)) !== -1;
+                                            out += on ? '<mark>' + escapeHtml(name.charAt(i)) + '</mark>' : escapeHtml(name.charAt(i));
+                                        }
+                                        return out;
+                                    }
+
                                     function makePointSearch(sel, input, list) {
                                         var items = [];
                                         // 目前列出的節點 id
@@ -66829,18 +67043,25 @@
                                             // 輸入框顯示的就是目前選的點時，當成還沒打字，列出整區
                                             if (sel.value && NODES[sel.value] && q === NODES[sel.value].name)
                                                 q = '';
-                                            var head = []
-                                              , rest = [];
-                                            idsByElev.forEach(function(id) {
-                                                if (!inActiveComp(id))
-                                                    return;
-                                                var at = q ? NODES[id].name.indexOf(q) : 0;
-                                                if (at === -1)
-                                                    return;
-                                                (at === 0 ? head : rest).push(id);
-                                                // 開頭就符合的排前面
+                                            var pool = idsByElev.filter(inActiveComp);
+                                            var verdict = fuzzyFilter(pool.map(function(id) {
+                                                return NODES[id].name;
+                                            }), q);
+                                            // 分數高的排前面；同分維持原本的高度排序
+                                            items = pool.map(function(id, i) {
+                                                return {
+                                                    id: id,
+                                                    ok: verdict[i].ok,
+                                                    score: verdict[i].score,
+                                                    i: i
+                                                };
+                                            }).filter(function(o) {
+                                                return o.ok;
+                                            }).sort(function(a, b) {
+                                                return (b.score - a.score) || (a.i - b.i);
+                                            }).map(function(o) {
+                                                return o.id;
                                             });
-                                            items = head.concat(rest);
                                             list.innerHTML = '';
                                             items.forEach(function(id) {
                                                 var li = document.createElement('li');
@@ -66848,16 +67069,14 @@
                                                 li.setAttribute('role', 'option');
                                                 if (id === sel.value)
                                                     li.className = 'cur';
-                                                var name = escapeHtml(NODES[id].name);
-                                                if (q)
-                                                    name = name.replace(escapeHtml(q), '<mark>' + escapeHtml(q) + '</mark>');
+                                                var name = q ? fuzzyMarkHtml(NODES[id].name, q) : escapeHtml(NODES[id].name);
                                                 li.innerHTML = '<span>' + name + '</span><span class="elev">' + Math.round(NODES[id].elev) + ' m</span>';
                                                 list.appendChild(li);
                                             });
                                             if (!items.length) {
                                                 var li = document.createElement('li');
                                                 li.className = 'combo-empty';
-                                                li.textContent = '這一區沒有名稱含「' + q + '」的點。';
+                                                li.textContent = '這一區找不到符合「' + q + '」的點。';
                                                 list.appendChild(li);
                                             }
                                             list.hidden = false;
@@ -66977,9 +67196,8 @@
                                     }
 
                                     function renderViaList() {
+                                        // 起點也可以當通過點（例如繞一圈回到起點），所以清單不排除它
                                         var excludeIds = {};
-                                        if (startSel.value)
-                                            excludeIds[startSel.value] = true;
                                         if (finishSel.value)
                                             excludeIds[finishSel.value] = true;
                                         var checkedIds = {};
@@ -67011,8 +67229,12 @@
                                     function applyViaFilter() {
                                         var q = viaSearch.value.trim();
                                         var shown = 0;
-                                        viaBox.querySelectorAll('.via-item').forEach(function(row) {
-                                            var hit = !q || row.getAttribute('data-name').indexOf(q) !== -1;
+                                        var rows = Array.prototype.slice.call(viaBox.querySelectorAll('.via-item'));
+                                        var verdict = fuzzyFilter(rows.map(function(row) {
+                                            return row.getAttribute('data-name');
+                                        }), q);
+                                        rows.forEach(function(row, i) {
+                                            var hit = !q || verdict[i].ok;
                                             row.hidden = !hit;
                                             if (hit)
                                                 shown++;
@@ -67020,7 +67242,7 @@
                                         var empty = document.getElementById('viaEmpty');
                                         if (empty) {
                                             empty.hidden = shown > 0;
-                                            empty.textContent = q ? '這一區沒有名稱含「' + q + '」的點。' : '這一區沒有其他可選的點。';
+                                            empty.textContent = q ? '這一區找不到符合「' + q + '」的點。' : '這一區沒有其他可選的點。';
                                         }
                                     }
                                     viaSearch.addEventListener('input', applyViaFilter);
@@ -67105,9 +67327,19 @@
                                         return el;
                                     }
 
+                                    // 剖面圖上有標出名稱的點（含編號），游標經過時在提示裡多顯示名稱；
+                                    // thr 是「離這個點多近（公尺）算經過」，相當於圖上約 7 像素
+                                    var PROFILE_LABELS = {
+                                        list: [],
+                                        thr: 0
+                                    };
                                     function renderProfile() {
                                         profileSvg.innerHTML = '';
                                         PROFILE_GEOM = null;
+                                        PROFILE_LABELS = {
+                                            list: [],
+                                            thr: 0
+                                        };
                                         var st = PROFILE_STATE;
                                         if (!st)
                                             return;
@@ -67141,6 +67373,58 @@
                                         function y(e) {
                                             return H - padB - ((e - minE) / (maxE - minE)) * (H - padT - padB);
                                         }
+
+                                        // 標名稱的優先順序：起點終點 > 使用者選的通過點（有編號的）> 其他順路經過的點；
+                                        // 位置太近的低優先點讓位，不會因為從左到右先到先得而擠掉選好的通過點。
+                                        var labeled = {}
+                                          , labeledX = [];
+                                        function tryLabel(i, force) {
+                                            var px = x(waypoints[i].cumDist);
+                                            if (!force && labeledX.some(function(v) {
+                                                return Math.abs(px - v) < 13;
+                                            }))
+                                                return;
+                                            labeled[i] = true;
+                                            labeledX.push(px);
+                                        }
+                                        tryLabel(0, true);
+                                        tryLabel(waypoints.length - 1, true);
+                                        waypoints.forEach(function(wp, i) {
+                                            if (wp.viaOrder && !labeled[i])
+                                                tryLabel(i, false);
+                                        });
+                                        waypoints.forEach(function(wp, i) {
+                                            if (!labeled[i])
+                                                tryLabel(i, false);
+                                        });
+                                        // 起點終點與選好的通過點要把名稱完整標出來：上方留白依其中最長的名稱撐高
+                                        // （含編號前綴），但不能擠掉太多繪圖空間。其他順路點仍視空間截短。
+                                        var needChars = 0;
+                                        waypoints.forEach(function(wp, i) {
+                                            if (!labeled[i])
+                                                return;
+                                            var isEndPt = i === 0 || i === waypoints.length - 1;
+                                            var o = isEndPt ? 0 : (wp.viaOrder || 0);
+                                            if (!isEndPt && !o)
+                                                return;
+                                            var len = NODES[wp.id].name.length + Math.ceil((o ? String(o).length + 2 : 0) * 0.55);
+                                            if (len > needChars)
+                                                needChars = len;
+                                        });
+                                        padT = Math.max(padT, Math.min(Math.ceil(needChars * 11.5) + 10, 160, H - padB - 90));
+                                        maxChars = Math.max(3, Math.floor((padT - 10) / 11.5));
+                                        PROFILE_LABELS = {
+                                            // 路線上所有有名稱的點都列進來（不只圖上標得出名稱的那幾個）
+                                            list: waypoints.map(function(wp, i) {
+                                                var isEndPt = i === 0 || i === waypoints.length - 1;
+                                                var o = isEndPt ? 0 : (wp.viaOrder || 0);
+                                                return {
+                                                    d: wp.cumDist,
+                                                    text: (o ? o + '. ' : '') + NODES[wp.id].name
+                                                };
+                                            }),
+                                            thr: 7 / Math.max(1, W - padL - padR) * maxD
+                                        };
 
                                         var defs = svgEl('defs', {});
                                         var grad = document.createElementNS(SVG_NS, 'linearGradient');
@@ -67212,13 +67496,11 @@
 
                                         // 路線經過的每個命名點：虛線、圓點、直排地名。
                                         // 太靠近上一個已標名稱的點就只畫圓點，免得字疊成一團；起點與終點一定標。
-                                        var lastLabelX = -Infinity;
-                                        var lastX = x(maxD);
                                         waypoints.forEach(function(wp, i) {
                                             var isStart = i === 0
                                               , isFinish = i === waypoints.length - 1;
                                             var isEnd = isStart || isFinish;
-                                            var order = isEnd ? 0 : (viaSetForMap[wp.id] || 0);
+                                            var order = isEnd ? 0 : (wp.viaOrder || 0);
                                             var lx = x(wp.cumDist)
                                               , ly = y(wp.elev);
                                             svgEl('line', {
@@ -67240,13 +67522,13 @@
                                                 'stroke-width': isEnd ? 1.5 : 1.3
                                             });
 
-                                            var roomy = lx - lastLabelX >= 13 && (isFinish || lastX - lx >= 13);
-                                            if (!isEnd && !roomy)
+                                            if (!labeled[i])
                                                 return;
-                                            lastLabelX = lx;
                                             var name = NODES[wp.id].name;
-                                            if (name.length > maxChars)
-                                                name = name.slice(0, maxChars - 1) + '…';
+                                            // 編號前綴（如「1. 」）也佔一點長度，一起算進去才不會被截掉頭
+                                            var room = maxChars - Math.ceil((order ? String(order).length + 2 : 0) * 0.55);
+                                            if (name.length > room)
+                                                name = name.slice(0, Math.max(1, room - 1)) + '…';
                                             var lxText = Math.min(lx + 4, W - 3);
                                             svgEl('text', {
                                                 x: lxText,
@@ -67314,10 +67596,26 @@
                                         return dd > 0 ? (profile[b][1] - profile[a][1]) / dd * 100 : 0;
                                     }
 
-                                    function hoverHtml(profile, idx) {
+                                    // split 為真（地圖上的提示）：只顯示最近的那一個點名稱；
+                                    // 剖面圖上的提示維持把附近的點名稱用「、」連成一行
+                                    function hoverHtml(profile, idx, split) {
                                         var p = profile[idx];
                                         var s = Math.round(slopeAt(profile, idx));
-                                        return (p[0] / 1000).toFixed(2) + ' km<span class="sep">|</span>' + fmtInt(p[1]) + ' m' + '<span class="sep">|</span>坡度 ' + (s > 0 ? '+' : (s < 0 ? '−' : '')) + Math.abs(s) + '%';
+                                        // 游標附近經過的有名稱的點全部列出來（離得近的幾個點一起顯示，近的在前）
+                                        var nearNames = PROFILE_LABELS.list.filter(function(L) {
+                                            return Math.abs(L.d - p[0]) <= PROFILE_LABELS.thr;
+                                        }).sort(function(a, b) {
+                                            return Math.abs(a.d - p[0]) - Math.abs(b.d - p[0]);
+                                        }).map(function(L) {
+                                            return L.text;
+                                        }).filter(function(t, i, arr) {
+                                            return arr.indexOf(t) === i;
+                                        });
+                                        var stats = (Math.max(0, p[0]) / 1000).toFixed(2) + ' km<span class="sep">|</span>' + fmtInt(p[1]) + ' m' + '<span class="sep">|</span>坡度 ' + (s > 0 ? '+' : (s < 0 ? '−' : '')) + Math.abs(s) + '%';
+                                        // 地圖上的提示只顯示離游標最近的那一個點的名稱（附近還有其他點時不一起列）
+                                        if (split)
+                                            nearNames = nearNames.slice(0, 1);
+                                        return (nearNames.length ? '<b class="tip-name">' + escapeHtml(nearNames.join('、')) + '</b><span class="sep">|</span>' : '') + stats;
                                     }
 
                                     // 剖面與地圖共用同一個游標：在剖面上移動時地圖上的點跟著走，
@@ -67368,7 +67666,7 @@
                                             ROUTE_HOVER_MARKER.setLatLng([p[2], p[3]]);
                                             if (!OVERVIEW_MAP.hasLayer(ROUTE_HOVER_MARKER))
                                                 ROUTE_HOVER_MARKER.addTo(OVERVIEW_MAP);
-                                            ROUTE_HOVER_TIP.setLatLng([p[2], p[3]]).setContent(html);
+                                            ROUTE_HOVER_TIP.setLatLng([p[2], p[3]]).setContent(hoverHtml(profile, idx, true));
                                             if (!OVERVIEW_MAP.hasLayer(ROUTE_HOVER_TIP))
                                                 OVERVIEW_MAP.openTooltip(ROUTE_HOVER_TIP);
                                         }
@@ -67880,23 +68178,35 @@
                                         if (cb)
                                             cb.checked = on;
                                     }
+                                    var START_UNSTACKED = false;
+                                    // 剛把疊在起點上的通過點取消掉；緊接著再點起點就是取消起點
                                     function handleOverviewPick(id) {
                                         if (!NODES[id])
                                             return;
                                         var role = overviewRoleOf(id);
+                                        var wasUnstacked = START_UNSTACKED;
+                                        START_UNSTACKED = false;
                                         if (role === 'both') {
                                             startSel.value = '';
                                             finishSel.value = '';
                                         } else if (role === 'start') {
-                                            startSel.value = '';
+                                            // 點起點：單獨的起點 → 疊上一個通過點；已疊著 → 取消那個通過點；
+                                            // 取消後緊接著再點一下 → 取消起點（再點地圖就能重新選起點）
+                                            var scb = viaCheckbox(id);
+                                            if (scb && scb.checked) {
+                                                scb.checked = false;
+                                                START_UNSTACKED = true;
+                                            } else if (wasUnstacked || !scb) {
+                                                startSel.value = '';
+                                            } else {
+                                                scb.checked = true;
+                                            }
                                         } else if (role === 'finish') {
                                             finishSel.value = '';
                                         } else if (role === 'via') {
                                             setViaChecked(id, false);
                                         } else if (!startSel.value) {
                                             startSel.value = id;
-                                        } else if (!finishSel.value) {
-                                            finishSel.value = id;
                                         } else {
                                             setViaChecked(id, true);
                                         }
@@ -67978,7 +68288,7 @@
                                         if (role === 'both')
                                             return '起點／終點｜' + name;
                                         if (role === 'start')
-                                            return '起點｜' + name;
+                                            return order ? '起點・通過 ' + order + '｜' + name : '起點｜' + name;
                                         if (role === 'finish')
                                             return '終點｜' + name;
                                         return name;
@@ -68246,17 +68556,15 @@
 
                                     // 下一下點在地圖上會做什麼，照目前的狀態寫在地圖左上角，不用猜
                                     function updateOverviewPickHint() {
-                                        if (overviewClearBtn)
-                                            overviewClearBtn.disabled = selectedIds().length === 0;
+                                        if (typeof setRouteButtons === 'function' && clearRouteMapBtn)
+                                            setRouteButtons();
                                         var el = document.getElementById('overviewPick');
                                         if (!el)
                                             return;
                                         if (!startSel.value) {
                                             el.innerHTML = '在地圖上點一下任一個點，設為 <b>起點</b>';
-                                        } else if (!finishSel.value) {
-                                            el.innerHTML = '再點一下另一個點設為 <b>終點</b>（點回起點可取消）';
                                         } else {
-                                            el.innerHTML = '繼續點其他點，會加入 <b>第 ' + (VIA_ORDER.length + 1) + ' 個通過點</b>（點已選的點可取消）';
+                                            el.innerHTML = '再點其他點加入 <b>第 ' + (VIA_ORDER.length + 1) + ' 個通過點</b>（最後一個即終點；點起點可疊上通過點）';
                                         }
                                     }
 
@@ -68293,8 +68601,8 @@
                                                 chosenIds.push(id);
                                             }
                                             // 通過點的順序也算進去：前面的點取消後，後面的編號會往前遞補，標籤要重畫
-                                            var order = role === 'via' ? viaOrderOf(id) : 0;
-                                            var state = role === 'via' ? 'via:' + order : role;
+                                            var order = (role === 'via' || role === 'start') ? viaOrderOf(id) : 0;
+                                            var state = order ? role + ':' + order : role;
                                             if (OVERVIEW_ROLES[id] === state)
                                                 return;
                                             // 角色沒變就不用重畫
@@ -68381,8 +68689,8 @@
                                             keepView: true
                                         });
                                     }
-                                    var viaSetForMap = {};
-                                    // 通過點 id -> 走訪順序（1 起算）
+                                    var CALC_SEQ = null;
+                                    // 這次計算的 [起點, 通過點1, 通過點2, ...]，computeRoute 用它標出實際走訪順序
 
                                     // 「顯示名稱」「對準路線」「清除路線」三顆地圖按鈕
                                     var toggleLabelsBtn = document.getElementById('toggleLabels');
@@ -68409,11 +68717,11 @@
                                             updateOverviewSelection();
                                         // 還沒算路線時就對準目前選的點
                                     });
+                                    // 「清除路線」一次清掉算好的路線與所有選點（起點、通過點）
                                     clearRouteMapBtn.addEventListener('click', function() {
                                         clearRoute();
-                                    });
-                                    document.getElementById('clearRouteSide').addEventListener('click', function() {
-                                        clearRoute();
+                                        clearAllPicks();
+                                        setRouteButtons();
                                     });
 
                                     // trim trailing zeros off a fixed-decimal string, e.g. "1.050"->"1.05", "2.40"->"2.4"
@@ -68468,7 +68776,7 @@
                                         var html = [];
                                         route.waypoints.forEach(function(wp, i) {
                                             var n = NODES[wp.id];
-                                            var order = (i === 0 || i === last) ? 0 : (viaSetForMap[wp.id] || 0);
+                                            var order = (i === 0 || i === last) ? 0 : (wp.viaOrder || 0);
                                             var cls = i === 0 ? 'start' : (i === last ? 'finish' : (order ? 'via' : ''));
                                             var elev = (i === 0 || i === last) ? '' : '<small>（' + Math.round(n.elev) + ' m）</small>';
                                             html.push('<li class="seq-node ' + cls + '" data-node="' + wp.id + '"' + (order ? ' data-order="' + order + '"' : '') + '>' + '<span class="seq-dot"></span><span class="seq-name">' + escapeHtml(n.name) + elev + '</span>' + '<span class="seq-time">' + fmtHr(cum[i]) + '</span></li>');
@@ -68737,7 +69045,7 @@
                                     function setRouteButtons() {
                                         var has = CURRENT_ROUTES.length > 0;
                                         fitRouteBtn.disabled = !has && selectedIds().length === 0;
-                                        clearRouteMapBtn.disabled = !has;
+                                        clearRouteMapBtn.disabled = !has && selectedIds().length === 0;
                                     }
 
                                     // 統計旁的提醒：路線經過哪些國家公園／保護區，以及時間與高程的算法
@@ -68761,7 +69069,6 @@
                                                 return escapeHtml(a.name);
                                             }).join('、') + '</b>，進入前請確認是否需要許可。</p>');
                                         }
-                                        lines.push('<p>時間依各路段的行進方向分別採計，上坡與下坡不同；爬升與下降由路段上的高程點逐點累計。</p>');
                                         el.innerHTML = lines.join('');
                                     }
 
@@ -68820,31 +69127,36 @@
 
                                     function runCalc() {
                                         clearError();
-                                        var startId = startSel.value
-                                          , finishId = finishSel.value;
+                                        var startId = startSel.value;
                                         syncViaOrder();
                                         var viaIds = VIA_ORDER.slice();
-                                        // 依勾選順序走訪
+                                        // 依勾選順序走訪；沒有獨立的終點，最後一個通過點就是路線終點
 
-                                        if (!startId || !finishId) {
-                                            showError('請先選擇起點與終點。');
+                                        if (!startId) {
+                                            showError('請先選擇起點。');
                                             return;
                                         }
-                                        if (startId === finishId && viaIds.length === 0) {
-                                            showError('起點與終點相同，請重新選擇。');
+                                        if (viaIds.length === 0) {
+                                            showError('請至少勾選一個通過點（最後一個即為終點）。');
+                                            return;
+                                        }
+                                        if (viaIds.every(function(id) {
+                                            return id === startId;
+                                        })) {
+                                            showError('通過點與起點相同，沒有路可走，請再選其他通過點。');
                                             return;
                                         }
                                         // 選單與地圖都只列得出目前區域的點，正常操作不會跨區；這裡再擋一次，
                                         // 萬一真的跨區（不同連通區塊之間沒有路）就直接告訴使用者，不必白跑搜尋
                                         var comp = NODES[startId].comp;
-                                        var crosses = [finishId].concat(viaIds).some(function(id) {
+                                        var crosses = viaIds.some(function(id) {
                                             return NODES[id].comp !== comp;
                                         });
                                         if (crosses) {
                                             showError('此路徑無法通過，請查看地圖後重試其他路線。');
                                             return;
                                         }
-                                        var seq = [startId].concat(viaIds).concat([finishId]);
+                                        var seq = [startId].concat(viaIds);
                                         // 找路只用到路段長度與時間，不需要剖面；找不到就不用去載剖面。
                                         // 時間最短與距離最短一次都找好，算完可以直接在「路徑」區切換，不必重算
                                         var keepMode = ROUTE_MODE;
@@ -68867,15 +69179,14 @@
                                             // 載入期間又按了一次（或清掉了），以新的那次為準
                                             setCalcBusy(false);
                                             updateProfileMeta();
-                                            viaSetForMap = {};
-                                            viaIds.forEach(function(v, i) {
-                                                viaSetForMap[v] = i + 1;
-                                            });
+                                            CALC_SEQ = seq;
                                             CURRENT_SETS = {
                                                 time: found.time.map(computeRoute),
                                                 dist: found.dist.map(computeRoute)
                                             };
                                             showRouteSet(ROUTE_MODE);
+                                            if (CURRENT_SETS.time[0])
+                                                saveHistory(seq, comp, CURRENT_SETS.time[0]);
                                             // 窄螢幕是整頁捲動，算完把地圖與結果捲進畫面
                                             if (window.innerWidth <= 900)
                                                 document.querySelector('.main').scrollIntoView({
@@ -68891,6 +69202,114 @@
                                         });
                                     }
                                     calcBtn.addEventListener('click', runCalc);
+
+                                    // ---------- 計算過的路線記憶 ----------
+                                    // 每次成功算出路線就記下「起點＋依序通過點」與當時的統計，存在這個瀏覽器的 localStorage，
+                                    // 點記錄就重新載入並計算。最多留 20 筆，同一組選點只留最新一筆。
+                                    var HISTORY_KEY = 'trailPlannerHistory_v1';
+                                    var HISTORY_MAX = 20;
+                                    var historySec = document.getElementById('historySec');
+                                    var historyList = document.getElementById('historyList');
+                                    function loadHistory() {
+                                        try {
+                                            var raw = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+                                            return Array.isArray(raw) ? raw.filter(function(e) {
+                                                return e && Array.isArray(e.seq) && e.seq.length >= 2 && e.seq.every(function(id) {
+                                                    return NODES[id];
+                                                });
+                                            }) : [];
+                                        } catch (err) {
+                                            return [];
+                                        }
+                                    }
+                                    function storeHistory(list) {
+                                        try {
+                                            localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
+                                        } catch (err) {}
+                                    }
+                                    function saveHistory(seq, comp, route) {
+                                        var key = seq.join('>');
+                                        var list = loadHistory().filter(function(e) {
+                                            return e.key !== key;
+                                        });
+                                        list.unshift({
+                                            key: key,
+                                            seq: seq.slice(),
+                                            comp: comp,
+                                            dist: route.totalDist,
+                                            min: route.totalMin,
+                                            gain: route.gain,
+                                            loss: route.loss,
+                                            at: Date.now()
+                                        });
+                                        storeHistory(list.slice(0, HISTORY_MAX));
+                                        renderHistory();
+                                    }
+                                    function renderHistory() {
+                                        var list = loadHistory();
+                                        historySec.hidden = list.length === 0;
+                                        historyList.innerHTML = '';
+                                        list.forEach(function(e) {
+                                            var row = document.createElement('div');
+                                            row.className = 'hist-item';
+                                            var names = e.seq.map(function(id) {
+                                                return NODES[id].name;
+                                            }).join(' → ');
+                                            var area = COMPS[e.comp] ? COMPS[e.comp].name : '';
+                                            row.innerHTML = '<button class="hist-main" type="button" data-key="' + escapeHtml(e.key) + '" title="' + escapeHtml(names) + '">' + '<span class="hist-names">' + escapeHtml(names) + '</span>' + '<span class="hist-meta">' + escapeHtml(area) + ' · ' + fmtKm(e.dist) + ' km · ' + fmtHr(e.min) + ' 小時 · +' + fmtInt(e.gain) + ' m</span>' + '</button>' + '<button class="hist-del" type="button" data-key="' + escapeHtml(e.key) + '" title="刪除這筆記錄" aria-label="刪除這筆記錄">✕</button>';
+                                            historyList.appendChild(row);
+                                        });
+                                    }
+                                    function restoreHistory(key) {
+                                        var e = loadHistory().filter(function(x) {
+                                            return x.key === key;
+                                        })[0];
+                                        if (!e)
+                                            return;
+                                        clearRoute();
+                                        if (e.comp !== ACTIVE_COMP) {
+                                            initOverviewMap();
+                                            switchActiveComp(e.comp);
+                                        }
+                                        viaBox.querySelectorAll('input[type=checkbox]').forEach(function(cb) {
+                                            cb.checked = false;
+                                        });
+                                        syncViaOrder();
+                                        startSel.value = e.seq[0];
+                                        startSel.dispatchEvent(new Event('change',{
+                                            bubbles: true
+                                        }));
+                                        // 一個一個勾，勾選順序才會等於原本的走訪順序
+                                        e.seq.slice(1).forEach(function(id) {
+                                            var cb = viaCheckbox(id);
+                                            if (cb) {
+                                                cb.checked = true;
+                                                cb.dispatchEvent(new Event('change',{
+                                                    bubbles: true
+                                                }));
+                                            }
+                                        });
+                                        updateOverviewSelection();
+                                        runCalc();
+                                    }
+                                    historyList.addEventListener('click', function(ev) {
+                                        var del = ev.target.closest('.hist-del');
+                                        var main = ev.target.closest('.hist-main');
+                                        if (del) {
+                                            var k = del.getAttribute('data-key');
+                                            storeHistory(loadHistory().filter(function(e) {
+                                                return e.key !== k;
+                                            }));
+                                            renderHistory();
+                                        } else if (main) {
+                                            restoreHistory(main.getAttribute('data-key'));
+                                        }
+                                    });
+                                    document.getElementById('historyClear').addEventListener('click', function() {
+                                        storeHistory([]);
+                                        renderHistory();
+                                    });
+                                    renderHistory();
 
                                     var calcToken = 0;
                                     var CALC_LABEL = calcBtn.innerHTML;
@@ -68931,6 +69350,41 @@
                                     document.getElementById('metaProfilesTotal').textContent = EDGES.length;
 
                                     initOverviewMap();
+                                    // 按鈕列貼在地圖最底下，右邊要讓出版權文字的寬度，提示框才不會被它蓋住
+                                    (function() {
+                                        var tools = document.querySelector('.map-tools');
+                                        var attr = document.querySelector('#overviewMap .leaflet-control-attribution');
+                                        if (!tools || !attr)
+                                            return;
+                                        var mapEl = document.getElementById('overviewMap');
+                                        function fitTools() {
+                                            var mapW = mapEl.clientWidth;
+                                            var btnW = tools.querySelector('.map-btns').offsetWidth;
+                                            // 版權文字和按鈕在同一排：右邊放不下時把字再縮小，維持一行也不壓到按鈕
+                                            attr.style.fontSize = '';
+                                            var cssFont = parseFloat(getComputedStyle(attr).fontSize);
+                                            var room = mapW - 14 - btnW - 6 - 14;
+                                            var natural = attr.scrollWidth;
+                                            if (natural > room)
+                                                attr.style.fontSize = Math.max(4.5, cssFont * room / natural) + 'px';
+                                            var avail = mapW - 14 - btnW - 6 - (attr.offsetWidth + 14) - 14;
+                                            var above = avail < 300;
+                                            tools.classList.toggle('hint-above', above);
+                                            tools.style.setProperty('--hint-max', above ? 'none' : avail + 'px');
+                                        }
+                                        fitTools();
+                                        // 圖層切換、底圖載入後版權文字的內容會變，也要重新算
+                                        if (window.MutationObserver)
+                                            new MutationObserver(fitTools).observe(attr, {
+                                                childList: true,
+                                                characterData: true,
+                                                subtree: true
+                                            });
+                                        if (window.ResizeObserver)
+                                            new ResizeObserver(fitTools).observe(mapEl);
+                                        else
+                                            window.addEventListener('resize', fitTools);
+                                    })();
                                     // 一開始維持全台視角，讓使用者先看到有哪些區域；預設區域是最大的 c0，點別區的路網即可切換
                                     updateOverviewSelection({
                                         keepView: true
