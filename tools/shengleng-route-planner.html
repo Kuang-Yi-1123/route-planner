@@ -1197,7 +1197,7 @@
             .bottom {
                 background: var(--panel);
                 border-top: 1px solid var(--line);
-                height: clamp(340px, 56vh, 620px);
+                height: clamp(300px, 42vh, 480px);
                 display: flex;
                 flex-direction: column;
                 min-height: 0;
@@ -1283,6 +1283,19 @@
                 line-height: 1.55;
                 color: var(--muted);
                 margin: 0;
+            }
+
+            .notes.side-notes {
+                margin-top: 12px;
+                font-size: 13.5px;
+            }
+
+            .notes.side-notes:empty {
+                display: none;
+            }
+
+            .notes p + p {
+                margin-top: 6px;
             }
 
             .notes b {
@@ -1509,6 +1522,7 @@
                         </button>
                     </div>
                     <div class="path-cards" id="pathCards"></div>
+                    <div class="notes side-notes" id="routeNotes"></div>
                 </section>
                 <section class="sec" data-when-route>
                     <div class="sec-head">
@@ -1590,7 +1604,6 @@
                                     <div class="v" id="statLoss">–</div>
                                 </div>
                             </div>
-                            <div class="notes" id="routeNotes"></div>
                         </div>
                         <div class="profile-wrap" id="profileWrap">
                             <svg id="profileSvg"></svg>
